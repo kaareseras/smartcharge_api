@@ -1,16 +1,12 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, status, Header
-from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.config.database import get_session
 from app.config.homeassistant import get_ha_client
 from app.responses.charger import ChargerResponse, ChargerListResponse
-from app.responses.user import UserResponse, LoginResponse
-from app.schemas.user import RegisterUserRequest, ResetRequest, VerifyUserRequest, EmailRequest
 from app.schemas.charger import AddChargerRequest
-from app.services import user, charger
-from app.config.security import get_current_user, oauth2_scheme
+from app.services import charger
+from app.config.security import get_current_user
 
 
 charger_router = APIRouter(
