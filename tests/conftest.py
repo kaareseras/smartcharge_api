@@ -5,7 +5,7 @@ import os
 from typing import Any, Generator
 from unittest.mock import Mock, patch
 
-import homeassistant_api
+from homeassistant_api import State
 
 import pytest
 from sqlalchemy import create_engine
@@ -30,7 +30,32 @@ engine = create_engine("sqlite:///./fastapi.db")
 SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 @pytest.fixture(scope="function")
-def mock_get_state() -> Generator[Any, Any, Any]:
+def state_status ():
+    state: State =  State( 
+        entity_id="sensor.javis_status",
+        attributes={},
+        state="ok", 
+        last_changed=datetime.utcnow(),
+        last_updated=datetime.utcnow(),
+        context={"id": "1234567890"},
+    )
+    return state
+
+@pytest.fixture(scope="function")
+def state_power ():
+    state: State =  State( 
+        entity_id="sensor.javis_power",
+        attributes={},
+        state="999.0", 
+        last_changed=datetime.utcnow(),
+        last_updated=datetime.utcnow(),
+        context={"id": "1234567890"},
+    )
+    return state
+
+
+@pytest.fixture(scope="function")
+def mock_get_state(state_status, state_power) -> Generator[Any, Any, Any]:
     """
     Fixture that mocks the homeassistant_api get_state method.
 
@@ -38,9 +63,12 @@ def mock_get_state() -> Generator[Any, Any, Any]:
         Generator: A generator that yields the mock get_state method.
     """
 
-
     with patch(
-        "homeassistant_api.Client.get_state"
+        "homeassistant_api.Client.get_state",
+        side_effect = lambda entity_id: {
+            "sensor.javis_status": state_status,
+            "sensor.javis_power": state_power,
+        }.get(entity_id, None)
     ) as get_state_mock:
         yield get_state_mock
 

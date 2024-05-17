@@ -9,3 +9,6 @@ class AddChargerRequest(BaseModel):
     max_power: int
     HA_Entity_ID_state: str
     HA_Entity_ID_current_power: str
+
+class UpdateChargerRequest(AddChargerRequest):
+    id: int

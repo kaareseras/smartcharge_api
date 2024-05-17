@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.config.database import get_session
 from app.config.homeassistant import get_ha_client
 from app.responses.charger import ChargerResponse, ChargerListResponse
-from app.schemas.charger import AddChargerRequest
+from app.schemas.charger import AddChargerRequest, UpdateChargerRequest
 from app.services import charger
 from app.config.security import get_current_user
 
@@ -16,7 +16,7 @@ charger_router = APIRouter(
 )
 
 @charger_router.get("", status_code=status.HTTP_200_OK, response_model=list[ChargerListResponse])
-async def get_charger_info(
+async def get_charger(
     session: Session = Depends(get_session), 
     user = Depends(get_current_user)
 ):
@@ -41,7 +41,15 @@ async def add_new_charger(
 ):
     return await charger.add_charger(data, session, ha_client)
 
-
+@charger_router.put("/{pk}",status_code=status.HTTP_200_OK, response_model=ChargerResponse)
+async def update_charger(
+    data: UpdateChargerRequest,
+    session: Session = Depends(get_session), 
+    ha_client = Depends(get_ha_client),
+    user = Depends(get_current_user),
+      
+):
+    return await charger.update_charger(data, session, ha_client)
 
 
 @charger_router.delete("/{pk}", status_code=status.HTTP_200_OK)

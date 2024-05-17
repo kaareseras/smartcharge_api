@@ -77,6 +77,31 @@ async def delete_charger(data, session):
     return {"message": "Charger deleted successfully."}
 
 
+
+async def update_charger(data, session, ha_client):
+    charger = session.query(Charger).filter(Charger.id == data.id).first()
+
+    if not charger:
+        raise HTTPException(status_code=404, detail="Charger not found.")
+
+    charger.name = data.name
+    charger.type = data.type
+    charger.address = data.address
+    charger.img = charger.img
+    charger.is_active = data.is_active
+    charger.max_power = data.max_power
+    charger.HA_Entity_ID_state = data.HA_Entity_ID_state
+    charger.HA_Entity_ID_current_power = data.HA_Entity_ID_current_power
+    charger.created_at = charger.created_at
+    charger.updated_at = datetime.utcnow()
+    session.commit()
+    session.refresh(charger)
+
+    # Get details for new charger and status and power from HomeAssistant
+
+    return await fetch_charger_details(charger.id, session, ha_client)
+
+
 async def add_charger(data, session, ha_client):
     charger = Charger()
     charger.name = data.name

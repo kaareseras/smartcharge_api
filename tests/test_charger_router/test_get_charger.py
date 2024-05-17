@@ -15,42 +15,18 @@ import pytest
 from app.services.user import _generate_tokens
 
 
-def test_fetch_charger(mock_get_state, client, charger, user, test_session):  
+def test_fetch_charger(mock_get_state, client, charger, state_status, state_power,user, test_session):  
     data = _generate_tokens(user, test_session)
     headers = {
         "Authorization": f"Bearer {data['access_token']}"
     }
 
-    state1: State =  State( 
-        entity_id="sensor.javis_status",
-        attributes={},
-        state="ok", 
-        last_changed=datetime.utcnow(),
-        last_updated=datetime.utcnow(),
-        context={"id": "1234567890"},
-    )
-    
-    state2: State =  State( 
-        entity_id="sensor.javis_power",
-        attributes={},
-        state="999.0", 
-        last_changed=datetime.utcnow(),
-        last_updated=datetime.utcnow(),
-        context={"id": "1234567890"},
-    )
-    
-    
-    mock_get_state.side_effect = lambda entity_id: {
-            "sensor.javis_status": state1,
-            "sensor.javis_power": state2,
-        }.get(entity_id, state1)
-
     response = client.get(f"/chargers/{charger.id}", headers=headers)
 
     assert response.status_code == 200
     assert response.json()['id'] == charger.id
-    assert response.json()['current_state'] == state1.state
-    assert response.json()['current_power'] == float(state2.state)
+    assert response.json()['current_state'] == state_status.state
+    assert response.json()['current_power'] == float(state_power.state)
 
 def test_fetch_charger_with_non_float_power(mock_get_state, client, charger, user, test_session):  
     data = _generate_tokens(user, test_session)

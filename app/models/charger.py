@@ -1,8 +1,8 @@
 # Description: Charger model for database table creation.
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, func, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
 from app.config.database import Base
-from sqlalchemy.orm import mapped_column, relationship
+
 
 class Charger(Base):
     __tablename__ = 'chargers'
