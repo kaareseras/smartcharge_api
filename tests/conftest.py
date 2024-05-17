@@ -147,5 +147,21 @@ def charger (test_session):
     test_session.refresh(model)
     return model
 
-
+@pytest.fixture(scope="function")
+def charger2 (test_session):
+    model = Charger()
+    model.name = "Javis Charger 2"
+    model.type = "Easee 2"
+    model.address = "Home 2"
+    model.img = "charger2.jpg"
+    model.is_active = True
+    model.max_power = 100
+    model.HA_Entity_ID_state= "sensor.javis_status"
+    model.HA_Entity_ID_current_power = "sensor.javis_power"
+    model.created_at = datetime.utcnow()
+    model.updated_at = datetime.utcnow()
+    test_session.add(model)
+    test_session.commit()
+    test_session.refresh(model)
+    return model
 

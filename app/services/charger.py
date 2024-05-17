@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from app.config.security import generate_token, get_token_payload, hash_password, is_password_strong_enough, load_user, str_decode, str_encode, verify_password
 from app.models.charger import Charger
 from app.models.user import User, UserToken
-from app.responses.charger import ChargerResponse
+from app.responses.charger import ChargerResponse, ChargerListResponse
 from app.services.homeassistant import get_state
 from app.services.email import send_account_activation_confirmation_email, send_account_verification_email, send_password_reset_email
 from app.utils.email_context import FORGOT_PASSWORD, USER_VERIFY_ACCOUNT
@@ -96,3 +96,20 @@ async def add_charger(data, session, ha_client):
     # Get details for new charger and status and power from HomeAssistant
 
     return await fetch_charger_details(charger.id, session, ha_client)
+
+
+async def fetch_chargers(session):  
+    chargers = session.query(Charger).all()
+
+    my_chargers = []
+
+    for charger in chargers:
+        my_chargers.append(ChargerListResponse(
+            id=charger.id,
+            name=charger.name,
+            type=charger.type,
+            address=charger.address,
+            img=charger.img,
+            is_active=charger.is_active
+        ))
+    return my_chargers

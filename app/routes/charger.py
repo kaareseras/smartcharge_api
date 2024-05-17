@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.config.database import get_session
 from app.config.homeassistant import get_ha_client
-from app.responses.charger import ChargerResponse
+from app.responses.charger import ChargerResponse, ChargerListResponse
 from app.responses.user import UserResponse, LoginResponse
 from app.schemas.user import RegisterUserRequest, ResetRequest, VerifyUserRequest, EmailRequest
 from app.schemas.charger import AddChargerRequest
@@ -18,6 +18,13 @@ charger_router = APIRouter(
     tags=["Charger"],
     responses={404: {"description": "Not found"}},
 )
+
+@charger_router.get("", status_code=status.HTTP_200_OK, response_model=list[ChargerListResponse])
+async def get_charger_info(
+    session: Session = Depends(get_session), 
+    user = Depends(get_current_user)
+):
+    return await charger.fetch_chargers(session)
 
 @charger_router.get("/{pk}", status_code=status.HTTP_200_OK, response_model=ChargerResponse)
 async def get_charger_info(

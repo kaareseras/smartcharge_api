@@ -19,3 +19,13 @@ class ChargerResponse(BaseResponse):
     current_power: float
     error: str = None
 
+
+class ChargerListResponse(BaseResponse):
+    id: int
+    name: str
+    type: str
+    address: str 
+    img:str
+    is_active: bool
+
+
