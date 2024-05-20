@@ -10,6 +10,7 @@ from alembic import context
 from app.models.user import *
 from app.models.charger import *
 
+
 from app.config.settings import get_settings
 settings = get_settings()
 

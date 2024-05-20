@@ -52,7 +52,7 @@ async def fetch_charger_details(data, session, ha_client):
         name=charger.name,
         type=charger.type,
         address=charger.address,
-        img=charger.img,
+        image_filename=charger.image_filename,
         is_active=charger.is_active,
         max_power=charger.max_power,
         HA_Entity_ID_state=charger.HA_Entity_ID_state,
@@ -87,7 +87,7 @@ async def update_charger(data, session, ha_client):
     charger.name = data.name
     charger.type = data.type
     charger.address = data.address
-    charger.img = charger.img
+    charger.img = charger.image_filename
     charger.is_active = data.is_active
     charger.max_power = data.max_power
     charger.HA_Entity_ID_state = data.HA_Entity_ID_state
@@ -107,7 +107,7 @@ async def add_charger(data, session, ha_client):
     charger.name = data.name
     charger.type = data.type
     charger.address = data.address
-    charger.img = ""
+    charger.image_filename = ""
     charger.is_active = data.is_active
     charger.max_power = data.max_power
     charger.HA_Entity_ID_state = data.HA_Entity_ID_state
@@ -134,7 +134,7 @@ async def fetch_chargers(session):
             name=charger.name,
             type=charger.type,
             address=charger.address,
-            img=charger.img,
+            image_filename=charger.image_filename,
             is_active=charger.is_active
         ))
     return my_chargers

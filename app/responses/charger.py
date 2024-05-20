@@ -8,7 +8,7 @@ class ChargerResponse(BaseResponse):
     name: str
     type: str
     address: str 
-    img:str
+    image_filename:str
     is_active: bool
     max_power: int
     HA_Entity_ID_state: str
@@ -25,7 +25,7 @@ class ChargerListResponse(BaseResponse):
     name: str
     type: str
     address: str 
-    img:str
+    image_filename:str
     is_active: bool
 
 

@@ -3,7 +3,7 @@ from json import loads
 import sys
 import os
 from typing import Any, Generator
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, mock_open, patch
 
 from homeassistant_api import State
 
@@ -163,7 +163,7 @@ def charger (test_session):
     model.name = "Javis Charger"
     model.type = "Easee"
     model.address = "Home"
-    model.img = "charger1.jpg"
+    model.image_filename = "charger1.jpg"
     model.is_active = True
     model.max_power = 100
     model.HA_Entity_ID_state= "sensor.javis_status"
@@ -181,7 +181,7 @@ def charger2 (test_session):
     model.name = "Javis Charger 2"
     model.type = "Easee 2"
     model.address = "Home 2"
-    model.img = "charger2.jpg"
+    model.image_filename = "charger2.jpg"
     model.is_active = True
     model.max_power = 100
     model.HA_Entity_ID_state= "sensor.javis_status"
@@ -192,4 +192,12 @@ def charger2 (test_session):
     test_session.commit()
     test_session.refresh(model)
     return model
+
+@pytest.fixture
+def mocker_open_image(mocker):
+    # Read a mocked /image/image-file
+    mocked_image = mocker.mock_open()
+    builtin_open = "builtins.open"
+    mocker.patch(builtin_open, mocked_image)
+
 

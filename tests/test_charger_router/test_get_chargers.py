@@ -13,7 +13,7 @@ def test_fetch_charger(client, charger, charger2, user, test_session):
         "Authorization": f"Bearer {data['access_token']}"
     }
 
-    response = client.get(f"/chargers/", headers=headers)
+    response = client.get("/chargers/", headers=headers)
 
     assert response.status_code == 200
 

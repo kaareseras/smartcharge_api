@@ -10,7 +10,7 @@ class Charger(Base):
     name = Column(String(150))
     type = Column(String(150))
     address = Column(String(255))
-    img = Column(String(255))
+    image_filename = Column(String(255))
     is_active = Column(Boolean, default=True)
     max_power = Column(Integer)
     HA_Entity_ID_state = Column(String(255))
