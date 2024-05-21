@@ -28,4 +28,7 @@ class ChargerListResponse(BaseResponse):
     image_filename:str
     is_active: bool
 
+class ChargerImageResponse(BaseResponse):
+    file_name: str
+
 

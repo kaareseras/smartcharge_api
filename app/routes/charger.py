@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, status
+import logging
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.config.database import get_session
 from app.config.homeassistant import get_ha_client
-from app.responses.charger import ChargerResponse, ChargerListResponse
+from app.responses.charger import ChargerImageResponse, ChargerResponse, ChargerListResponse
 from app.schemas.charger import AddChargerRequest, UpdateChargerRequest
 from app.services import charger
 from app.config.security import get_current_user
@@ -59,3 +61,12 @@ async def delete_charger(
     user = Depends(get_current_user)
 ):
     return await charger.delete_charger(pk, session)
+
+@charger_router.post("/image/{id}", status_code=status.HTTP_200_OK, response_model=ChargerImageResponse)
+async def create_upload_file(     
+    id: int,
+    file: UploadFile = File(...), 
+    session: Session = Depends(get_session),
+    user = Depends(get_current_user),
+): 
+    return await charger.save_charger_image(file, id, session)

@@ -3,7 +3,7 @@ from json import loads
 import sys
 import os
 from typing import Any, Generator
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import AsyncMock, Mock, mock_open, patch
 
 from homeassistant_api import State
 
@@ -71,6 +71,21 @@ def mock_get_state(state_status, state_power) -> Generator[Any, Any, Any]:
         }.get(entity_id, None)
     ) as get_state_mock:
         yield get_state_mock
+
+@pytest.fixture
+def mocker_open_image(mocker):
+    # Read a mocked /image/image-file
+    mocked_image = mocker.mock_open()
+    builtin_open = "builtins.open"
+    mocker.patch(builtin_open, mocked_image)
+
+@pytest.fixture(scope="function") 
+def mock_service_write_file() -> Generator:
+    with patch(
+        "app.services.image.save_image",
+        side_effect = Exception("Invalid type")
+    ) as get_mock_service_write_file:
+        yield get_mock_service_write_file
 
 
 @pytest.fixture(scope="function")
@@ -193,11 +208,6 @@ def charger2 (test_session):
     test_session.refresh(model)
     return model
 
-@pytest.fixture
-def mocker_open_image(mocker):
-    # Read a mocked /image/image-file
-    mocked_image = mocker.mock_open()
-    builtin_open = "builtins.open"
-    mocker.patch(builtin_open, mocked_image)
+
 
 

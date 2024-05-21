@@ -1,13 +1,17 @@
+import os
 from datetime import datetime, timedelta
 import logging
+from uuid import uuid1
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import joinedload
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from app.config.security import generate_token, get_token_payload, hash_password, is_password_strong_enough, load_user, str_decode, str_encode, verify_password
 from app.models.charger import Charger
 from app.models.user import User, UserToken
-from app.responses.charger import ChargerResponse, ChargerListResponse
+from app.responses.charger import ChargerImageResponse, ChargerResponse, ChargerListResponse
 from app.services.homeassistant import get_state
 from app.services.email import send_account_activation_confirmation_email, send_account_verification_email, send_password_reset_email
+from app.services.image import FileToLargeError, ImageTypeError, save_image
 from app.utils.email_context import FORGOT_PASSWORD, USER_VERIFY_ACCOUNT
 from app.config.settings import get_settings
 from homeassistant_api import  UnauthorizedError, MalformedDataError, MalformedInputError, ParameterMissingError, RequestError
@@ -138,3 +142,29 @@ async def fetch_chargers(session):
             is_active=charger.is_active
         ))
     return my_chargers
+
+
+
+async def save_charger_image(file: UploadFile, id, session):
+    
+    charger = session.query(Charger).filter(Charger.id == id).first()
+    
+    
+    if not charger:
+        return JSONResponse(content={"error": "Charger not found"}, status_code=404)
+    
+        
+    try:
+       unique_name_file_name = save_image(file)
+    except ImageTypeError as e:
+        return JSONResponse(content={"error": "Only images allowed"}, status_code=403)
+    except FileToLargeError as e:
+        return JSONResponse(content={"error": "File size too large"}, status_code=403)
+    
+    
+    charger.image_filename = unique_name_file_name
+    chargerImageResponse = ChargerImageResponse(file_name = unique_name_file_name)
+    session.commit()
+    session.refresh(charger)
+
+    return chargerImageResponse
