@@ -4,17 +4,17 @@ import logging
 from uuid import uuid1
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import joinedload
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException, Response, UploadFile
 from app.config.security import generate_token, get_token_payload, hash_password, is_password_strong_enough, load_user, str_decode, str_encode, verify_password
 from app.models.charger import Charger
 from app.models.user import User, UserToken
-from app.responses.charger import ChargerImageResponse, ChargerResponse, ChargerListResponse
+from app.responses.charger import ChargerImageGetResponse, ChargerImagePostResponse, ChargerResponse, ChargerListResponse
 from app.services.homeassistant import get_state
 from app.services.email import send_account_activation_confirmation_email, send_account_verification_email, send_password_reset_email
-from app.services.image import FileToLargeError, ImageTypeError, save_image
+from app.services.image import FileToLargeError, ImageTypeError, get_image, save_image
 from app.utils.email_context import FORGOT_PASSWORD, USER_VERIFY_ACCOUNT
 from app.config.settings import get_settings
-from homeassistant_api import  UnauthorizedError, MalformedDataError, MalformedInputError, ParameterMissingError, RequestError
+from homeassistant_api import  EndpointNotFoundError, UnauthorizedError, MalformedDataError, MalformedInputError, ParameterMissingError, RequestError
 
 
 settings = get_settings()
@@ -49,7 +49,9 @@ async def fetch_charger_details(data, session, ha_client):
     except RequestError as e:
         _error = f"Request error: {e}"
         logging.error(f"Request error: {e}")
-
+    except EndpointNotFoundError as e:
+        _error = f"Endpoint not found: {e}"
+        logging.error(f"Endpoint not found: {e}")
     
     my_charger = ChargerResponse(
         id=charger.id,
@@ -145,7 +147,7 @@ async def fetch_chargers(session):
 
 
 
-async def save_charger_image(file: UploadFile, id, session):
+async def save_charger_image(file: UploadFile, id, session) -> ChargerImagePostResponse:
     
     charger = session.query(Charger).filter(Charger.id == id).first()
     
@@ -163,8 +165,37 @@ async def save_charger_image(file: UploadFile, id, session):
     
     
     charger.image_filename = unique_name_file_name
-    chargerImageResponse = ChargerImageResponse(file_name = unique_name_file_name)
+    chargerImageResponse = ChargerImagePostResponse(file_name = unique_name_file_name)
     session.commit()
     session.refresh(charger)
 
     return chargerImageResponse
+
+
+
+async def get_charger_image(id, session) -> Response:
+    charger = session.query(Charger).filter(Charger.id == id).first()
+    
+
+    if not charger:
+        return JSONResponse(content={"error": "Charger not found"}, status_code=404)
+    
+    if charger.image_filename:
+        image_filename = charger.image_filename
+    else:
+        logging.info("Charger not found, return default image")
+        image_filename = os.path.join("default_images","default_charger.jpg")
+  
+    try:
+        image_bytes = get_image(image_filename)
+    except FileNotFoundError:
+        logging.info("Charger image not found, return default image")
+        image_filename = os.path.join("default_images","default_charger.jpg")
+        image_bytes = get_image(image_filename)
+
+    
+    # return response
+    response = Response(image_bytes, media_type="image/png")
+    
+    
+    return response

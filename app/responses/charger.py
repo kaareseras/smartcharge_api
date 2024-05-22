@@ -1,3 +1,4 @@
+from tkinter import image_types
 from typing import Union
 from datetime import datetime
 from app.responses.base import BaseResponse
@@ -28,7 +29,10 @@ class ChargerListResponse(BaseResponse):
     image_filename:str
     is_active: bool
 
-class ChargerImageResponse(BaseResponse):
+class ChargerImagePostResponse(BaseResponse):
     file_name: str
+
+class ChargerImageGetResponse(BaseResponse):
+    content: bytes
 
 

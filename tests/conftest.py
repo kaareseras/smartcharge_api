@@ -3,6 +3,7 @@ from json import loads
 import sys
 import os
 from typing import Any, Generator
+from unittest import mock
 from unittest.mock import AsyncMock, Mock, mock_open, patch
 
 from homeassistant_api import State
@@ -78,6 +79,18 @@ def mocker_open_image(mocker):
     mocked_image = mocker.mock_open()
     builtin_open = "builtins.open"
     mocker.patch(builtin_open, mocked_image)
+
+
+@pytest.fixture(scope='session')
+def small_image(tmp_path_factory):
+    img = tmp_path_factory.getbasetemp() / 'charger1.jpg'
+    img.write_bytes(b'spam')
+    return img
+
+@pytest.fixture(scope='session')
+def mock_path():
+    patcher = mock.patch('os.path.exists')
+    mock_thing = patcher.start()
 
 @pytest.fixture(scope="function") 
 def mock_service_write_file() -> Generator:
@@ -178,7 +191,8 @@ def charger (test_session):
     model.name = "Javis Charger"
     model.type = "Easee"
     model.address = "Home"
-    model.image_filename = "charger1.jpg"
+    #model.image_filename = "charger1.jpg"
+    model.image_filename = "charger.jpg"
     model.is_active = True
     model.max_power = 100
     model.HA_Entity_ID_state= "sensor.javis_status"
@@ -207,7 +221,5 @@ def charger2 (test_session):
     test_session.commit()
     test_session.refresh(model)
     return model
-
-
 
 
