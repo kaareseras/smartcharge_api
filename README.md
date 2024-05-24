@@ -35,7 +35,7 @@ You do not need to change anything here, but if you would like to change the use
 ### Commands
 - To Generate the Migration From Model
 ```
-docker-compose run fastapi-service /bin/sh -c "alembic revision --autogenerate -m "create my table table""
+docker-compose run fastapi-service /bin/sh -c "alembic revision --autogenerate -m 'create my table table'"
 ```
 - To Apply the Migration to Database
 ```

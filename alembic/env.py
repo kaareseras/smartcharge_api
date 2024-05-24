@@ -9,6 +9,7 @@ from alembic import context
 # Import All Models
 from app.models.user import *
 from app.models.charger import *
+from app.models.car import *
 
 
 from app.config.settings import get_settings
