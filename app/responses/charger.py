@@ -26,7 +26,7 @@ class ChargerListResponse(BaseResponse):
     name: str
     type: str
     address: str 
-    image_filename:str
+    image_filename:str | None
     is_active: bool
 
 class ChargerImagePostResponse(BaseResponse):

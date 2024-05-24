@@ -134,13 +134,16 @@ async def fetch_chargers(session):
 
     my_chargers = []
 
+    if not chargers:
+        raise HTTPException(status_code=404, detail="No chargers found.")
+
     for charger in chargers:
         my_chargers.append(ChargerListResponse(
             id=charger.id,
             name=charger.name,
             type=charger.type,
             address=charger.address,
-            image_filename=charger.image_filename,
+            image_filename=charger.image_filename if charger.image_filename else None,
             is_active=charger.is_active
         ))
     return my_chargers

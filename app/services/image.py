@@ -1,4 +1,5 @@
 import logging
+from logging import config
 import os
 from uuid import uuid1
 from fastapi import UploadFile
@@ -24,7 +25,7 @@ def save_image(myfile: UploadFile):
         raise ImageTypeError("Only images allowed")
         #return JSONResponse(content={"error": "Only images allowed"}, status_code=403)
     
-    if myfile.size > 1024 * 1024: # 1MB
+    if myfile.size > config.MAX_IMAGE_SIZE * 1024 * 1024: # 1MB
         raise FileToLargeError("File size too large")
         #return JSONResponse(content={"error": "File size too large"}, status_code=403)
     
