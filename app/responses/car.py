@@ -17,9 +17,14 @@ class CarResponse(BaseResponse):
     HA_Entity_ID_Trip: str
     HA_Entity_ID_SOC: str
     HA_Entity_ID_SOC_Max: str
-    HA_Entity_ID_Pluged_In: bool
+    HA_Entity_ID_Pluged_In: str
+    current_trip: float
+    current_soc: float
+    current_max_soc: float
+    current_is_plugged_in: bool
     created_at: Union[str, None, datetime] = None
     updated_at: Union[str, None, datetime] = None
+    error: str | None = None
 
 
 

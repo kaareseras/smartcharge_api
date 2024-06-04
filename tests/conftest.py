@@ -19,6 +19,7 @@ from app.main import app
 from app.config.email import fm
 from app.config.database import Base, get_session
 from app.models.charger import Charger
+from app.models.car import Car
 from app.models.user import User
 from app.config.security import hash_password
 from app.services.user import _generate_tokens
@@ -54,9 +55,63 @@ def state_power ():
     )
     return state
 
+@pytest.fixture(scope="function")
+def state_trip():
+    state: State =  State( 
+        entity_id="sensor.tesla_odometer",
+        attributes={},
+        state="9999.9", 
+        last_changed=datetime.utcnow(),
+        last_updated=datetime.utcnow(),
+        context={"id": "1234567890"},
+    )
+    return state
 
 @pytest.fixture(scope="function")
-def mock_get_state(state_status, state_power) -> Generator[Any, Any, Any]:
+def state_soc():
+    state: State =  State( 
+        entity_id="sensor.tesla_battery_level",
+        attributes={},
+        state="45", 
+        last_changed=datetime.utcnow(),
+        last_updated=datetime.utcnow(),
+        context={"id": "1234567890"},
+    )
+    return state
+
+@pytest.fixture(scope="function")
+def state_soc_max():
+    state: State =  State( 
+        entity_id="sensor.tesla_charge_limit_soc",
+        attributes={},
+        state="80", 
+        last_changed=datetime.utcnow(),
+        last_updated=datetime.utcnow(),
+        context={"id": "1234567890"},
+    )
+    return state
+
+@pytest.fixture(scope="function")
+def state_pluged_in():
+    state: State =  State( 
+        entity_id="sensor.binary_sensor.tesla_plugged_in",
+        attributes={},
+        state="on", 
+        last_changed=datetime.utcnow(),
+        last_updated=datetime.utcnow(),
+        context={"id": "1234567890"},
+    )
+    return state
+
+@pytest.fixture(scope="function")
+def mock_get_state(
+    state_status, 
+    state_power,
+    state_trip,
+    state_soc,
+    state_soc_max,
+    state_pluged_in,
+) -> Generator[Any, Any, Any]:
     """
     Fixture that mocks the homeassistant_api get_state method.
 
@@ -69,6 +124,10 @@ def mock_get_state(state_status, state_power) -> Generator[Any, Any, Any]:
         side_effect = lambda entity_id: {
             "sensor.javis_status": state_status,
             "sensor.javis_power": state_power,
+            "sensor.tesla_odometer": state_trip,
+            "sensor.tesla_battery_level": state_soc,
+            "sensor.tesla_charge_limit_soc": state_soc_max,
+            "binary_sensor.javis_pluged_in": state_pluged_in,
         }.get(entity_id, None)
     ) as get_state_mock:
         yield get_state_mock
@@ -223,3 +282,23 @@ def charger2 (test_session):
     return model
 
 
+@pytest.fixture(scope="function")
+def car (test_session):
+    model = Car()
+    model.model = "Tesla"
+    model.brand = "Model 3"
+    model.year = 2021
+    model.name = "Javis"
+    model.registration = "DD23920"
+    model.battery_capacity = 75
+    model.is_active = True
+    model.HA_Entity_ID_Trip = "sensor.tesla_odometer"
+    model.HA_Entity_ID_SOC = "sensor.tesla_battery_level"
+    model.HA_Entity_ID_SOC_Max = "sensor.tesla_charge_limit_soc"
+    model.HA_Entity_ID_Pluged_In = "binary_sensor.javis_pluged_in"
+    model.created_at = datetime.utcnow()
+    model.updated_at = datetime.utcnow()
+    test_session.add(model)
+    test_session.commit()
+    test_session.refresh(model)
+    return model

@@ -1,11 +1,9 @@
-import logging
 from fastapi import APIRouter, Depends, File, Form, Response, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.config.database import get_session
 from app.config.homeassistant import get_ha_client
-from app.models.car import Car
 from app.responses.car import CarResponse, CarListResponse, CarImagePostResponse, CarImageGetResponse, CarImagePostResponse
 from app.services import car
 

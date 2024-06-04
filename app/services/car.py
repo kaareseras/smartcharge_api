@@ -19,7 +19,7 @@ from homeassistant_api import  EndpointNotFoundError, UnauthorizedError, Malform
 
 settings = get_settings()
 
-async def fetch_car_details(data, session, ha_client):
+async def fetch_car_details(data, session, ha_client) -> CarResponse:
     car = session.query(Car).filter(Car.id == data).first()
     _error = ""
     if not car:
@@ -28,7 +28,7 @@ async def fetch_car_details(data, session, ha_client):
     _current_SoC=-1
     _current_Max_SoC=-1
     _current_Trip=-1
-    _current_pluged_in=False    
+    _current_pluged_in="off"    
     
     try:
         _current_SoC=float(get_state(ha_client, car.HA_Entity_ID_SOC))
@@ -56,6 +56,11 @@ async def fetch_car_details(data, session, ha_client):
     except EndpointNotFoundError as e:
         _error = f"Endpoint not found: {e}"
         logging.error(f"Endpoint not found: {e}")
+
+    if _current_pluged_in == "on":
+        _current_pluged_in = True
+    elif _current_pluged_in == "off":
+        _current_pluged_in = False
     
     my_car = CarResponse(
         id=car.id,
@@ -63,15 +68,20 @@ async def fetch_car_details(data, session, ha_client):
         brand=car.brand,
         model=car.model,
         year=car.year,
+        registration=car.registration,
         battery_capacity=car.battery_capacity,
         created_at=car.created_at,
         updated_at=car.updated_at,
         image_filename=car.image_filename if car.image_filename else None,
         is_active=car.is_active,
-        HA_Entity_ID_SOC=_current_SoC,
-        HA_Entity_ID_SOC_Max=_current_Max_SoC,
-        HA_Entity_ID_Trip=_current_Trip,
-        HA_Entity_ID_Pluged_In=_current_pluged_in,
+        HA_Entity_ID_SOC=car.HA_Entity_ID_SOC,
+        HA_Entity_ID_SOC_Max=car.HA_Entity_ID_SOC_Max,
+        HA_Entity_ID_Trip=car.HA_Entity_ID_Trip,
+        HA_Entity_ID_Pluged_In=car.HA_Entity_ID_Pluged_In,
+        current_soc=_current_SoC,
+        current_max_soc=_current_Max_SoC,
+        current_trip=_current_Trip,
+        current_is_plugged_in=_current_pluged_in,
         error=_error
 
 
@@ -132,7 +142,7 @@ async def add_car(data, session, ha_client):
     session.commit()
     session.refresh(car)
 
-    # Get details for new car and status and power from HomeAssistant
+    # Get details for new car from HomeAssistant
 
     return await fetch_car_details(car.id, session, ha_client)
 

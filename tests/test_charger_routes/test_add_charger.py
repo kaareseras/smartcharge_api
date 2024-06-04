@@ -10,7 +10,7 @@ from datetime import datetime
 from homeassistant_api import EndpointNotFoundError, State
 from app.services.user import _generate_tokens
 
-def test_add_charger(mock_get_state, client, charger, state_status, state_power, user, test_session):  
+def test_add_charger(mock_get_state, client, state_status, state_power, user, test_session):  
     data = _generate_tokens(user, test_session)
     headers = {
         "Authorization": f"Bearer {data['access_token']}"
@@ -34,7 +34,7 @@ def test_add_charger(mock_get_state, client, charger, state_status, state_power,
     assert response.json()['current_power'] == float(state_power.state)
 
 
-def test_delete_charger_while_not_logged_in(mock_get_state, client, charger):
+def test_add_charger_while_not_logged_in(mock_get_state, client, charger):
 
     response = client.get("/chargers/{charger.id}")
 

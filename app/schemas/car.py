@@ -8,6 +8,12 @@ class AddCarRequest(BaseModel):
     model : str
     year : int
     battery_capacity : int
+    HA_Entity_ID_Trip : str
+    HA_Entity_ID_SOC : str
+    HA_Entity_ID_SOC_Max : str
+    HA_Entity_ID_Pluged_In : str
+    is_active : bool
+
 
 
 
