@@ -290,6 +290,29 @@ def car (test_session):
     model.year = 2021
     model.name = "Javis"
     model.registration = "DD23920"
+    model.image_filename = "Tesla_jpg.jpg"
+    model.battery_capacity = 75
+    model.is_active = True
+    model.HA_Entity_ID_Trip = "sensor.tesla_odometer"
+    model.HA_Entity_ID_SOC = "sensor.tesla_battery_level"
+    model.HA_Entity_ID_SOC_Max = "sensor.tesla_charge_limit_soc"
+    model.HA_Entity_ID_Pluged_In = "binary_sensor.javis_pluged_in"
+    model.created_at = datetime.utcnow()
+    model.updated_at = datetime.utcnow()
+    test_session.add(model)
+    test_session.commit()
+    test_session.refresh(model)
+    return model
+
+@pytest.fixture(scope="function")
+def car2 (test_session):
+    model = Car()
+    model.model = "Tesla"
+    model.brand = "Model 3"
+    model.year = 2022
+    model.name = "Javis_2"
+    model.registration = "DD23921"
+    model.image_filename = "Tesla_jpg.jpg"
     model.battery_capacity = 75
     model.is_active = True
     model.HA_Entity_ID_Trip = "sensor.tesla_odometer"

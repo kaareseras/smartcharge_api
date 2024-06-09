@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     HA_TOKEN:str = os.getenv('HA_TOKEN')
 
     #Image Uploads
-    MAX_IMAGE_SIZE: int = int(os.environ.get("MAX_IMAGE_SIZE_MB", 2))
+    MAX_IMAGE_SIZE: int = int(os.environ.get("MAX_IMAGE_SIZE_MB", 1))
 
 @lru_cache()
 def get_settings() -> Settings:

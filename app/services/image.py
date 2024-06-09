@@ -4,8 +4,9 @@ import os
 from uuid import uuid1
 from fastapi import UploadFile
 from fastapi.responses import JSONResponse
+from app.config.settings import get_settings
 
-from app.models.charger import Charger
+settings = get_settings()
 
 
 class ImageTypeError(Exception):
@@ -25,7 +26,7 @@ def save_image(myfile: UploadFile):
         raise ImageTypeError("Only images allowed")
         #return JSONResponse(content={"error": "Only images allowed"}, status_code=403)
     
-    if myfile.size > config.MAX_IMAGE_SIZE * 1024 * 1024: # 1MB
+    if myfile.size > settings.MAX_IMAGE_SIZE * 1024 * 1024: # 1MB
         raise FileToLargeError("File size too large")
         #return JSONResponse(content={"error": "File size too large"}, status_code=403)
     

@@ -203,18 +203,18 @@ async def get_car_image(id, session) -> Response:
     
 
     if not car:
-        return JSONResponse(content={"error": "car not found"}, status_code=404)
+        return JSONResponse(content={"error": "Car not found"}, status_code=404)
     
     if car.image_filename:
         image_filename = car.image_filename
     else:
-        logging.info("car not found, return default image")
+        logging.info("Car not found, return default image")
         image_filename = os.path.join("default_images","default_car.jpg")
   
     try:
         image_bytes = get_image(image_filename)
     except FileNotFoundError:
-        logging.info("car image not found, return default image")
+        logging.info("Car image not found, return default image")
         image_filename = os.path.join("default_images","default_car.jpg")
         image_bytes = get_image(image_filename)
 

@@ -3,7 +3,7 @@
 2. if data is missing return 422
 3. If the user is not authenticated, return 401
 4. Succesfull add a new car to the DB where homeassistant tags are not ok
-/chargers/{charger_id}
+/cars/{car_id}
 """
 
 from datetime import datetime
